@@ -1,0 +1,7 @@
+{
+  "name": "PrimeSource Rice",
+  "description": "Locally grown, quality-assured Nigerian rice e-commerce platform and bulk supply distributor from Nasarawa State.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
+
