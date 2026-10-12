@@ -7,6 +7,7 @@ export interface Product {
   price: number; // in NGN
   inStock: boolean;
   stockCount: number;
+  status?: 'coming_soon' | 'in_stock';
   description: string;
   shortDescription: string;
   grainType: string;

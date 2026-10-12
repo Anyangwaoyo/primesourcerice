@@ -2,12 +2,14 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useApp } from '../context/AppContext.tsx';
 import { sendChatMessage } from '../services/api.ts';
 import { ChatMessage } from '../types/index.ts';
-import chatbotIcon from '../assets/images/chatbot_icon.jpg';
 import {
   X,
   Send,
   Minimize2,
-  Phone
+  Phone,
+  Wheat,
+  Bot,
+  Sparkles
 } from 'lucide-react';
 
 export const Chatbot: React.FC = () => {
@@ -95,12 +97,8 @@ export const Chatbot: React.FC = () => {
           className="fixed bottom-6 right-6 z-40 bg-[#174D36] text-white p-2 sm:px-4 sm:py-2.5 rounded-full shadow-2xl hover:bg-[#0F3324] hover:scale-105 active:scale-95 transition-all flex items-center gap-3 cursor-pointer border-2 border-[#C69C48]"
           aria-label="Open PrimeSource Assistant Chatbot"
         >
-          <div className="relative w-11 h-11 rounded-full overflow-hidden border-2 border-[#C69C48] bg-white flex items-center justify-center shrink-0 shadow-xs">
-            <img
-              src={chatbotIcon}
-              alt="PrimeSource Assistant"
-              className="w-full h-full object-cover"
-            />
+          <div className="relative w-11 h-11 rounded-full border-2 border-[#C69C48] bg-[#FAF9F6] flex items-center justify-center shrink-0 shadow-xs text-[#174D36]">
+            <Wheat className="w-6 h-6 stroke-[2.2] text-[#174D36]" />
             <span className="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-emerald-500 ring-2 ring-white animate-pulse" />
           </div>
           <div className="hidden sm:flex flex-col text-left pr-1">
@@ -116,12 +114,8 @@ export const Chatbot: React.FC = () => {
           {/* Header */}
           <div className="bg-[#174D36] text-white px-5 py-3.5 flex items-center justify-between border-b border-[#226B4C]">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-[#C69C48] bg-white flex items-center justify-center shrink-0 shadow-xs">
-                <img
-                  src={chatbotIcon}
-                  alt="PrimeSource Assistant"
-                  className="w-full h-full object-cover"
-                />
+              <div className="w-10 h-10 rounded-full border-2 border-[#C69C48] bg-[#FAF9F6] flex items-center justify-center shrink-0 shadow-xs text-[#174D36]">
+                <Wheat className="w-5 h-5 stroke-[2.2] text-[#174D36]" />
               </div>
               <div>
                 <h3 className="font-bold text-xs text-white flex items-center gap-1.5">
@@ -160,12 +154,8 @@ export const Chatbot: React.FC = () => {
                   className={`flex ${isUser ? 'justify-end' : 'justify-start items-end gap-2'}`}
                 >
                   {!isUser && (
-                    <div className="w-6 h-6 rounded-full overflow-hidden border border-[#C69C48] shrink-0 mb-4 bg-white shadow-2xs">
-                      <img
-                        src={chatbotIcon}
-                        alt="Assistant"
-                        className="w-full h-full object-cover"
-                      />
+                    <div className="w-6 h-6 rounded-full border border-[#C69C48] shrink-0 mb-4 bg-[#174D36] text-[#C69C48] flex items-center justify-center shadow-2xs">
+                      <Wheat className="w-3.5 h-3.5" />
                     </div>
                   )}
                   <div className={`flex flex-col ${isUser ? 'items-end' : 'items-start'} max-w-[85%]`}>
@@ -201,12 +191,8 @@ export const Chatbot: React.FC = () => {
 
             {loading && (
               <div className="flex items-center gap-2 text-xs text-[#6B726A] bg-white border border-[#EAE6DD] rounded-xl px-3 py-2 w-max shadow-2xs">
-                <div className="w-5 h-5 rounded-full overflow-hidden border border-[#C69C48] shrink-0">
-                  <img
-                    src={chatbotIcon}
-                    alt="Checking..."
-                    className="w-full h-full object-cover"
-                  />
+                <div className="w-5 h-5 rounded-full border border-[#C69C48] shrink-0 bg-[#174D36] text-[#C69C48] flex items-center justify-center">
+                  <Wheat className="w-3 h-3" />
                 </div>
                 <span>PrimeSource Assistant is checking product specifications...</span>
               </div>

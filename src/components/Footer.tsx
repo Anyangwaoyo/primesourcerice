@@ -76,8 +76,8 @@ export const Footer: React.FC = () => {
             </div>
 
             <div className="p-3 rounded-lg bg-[#0F3324] border border-[#226B4C]/40 text-[11px] text-[#B8B1A0]">
-              <span className="font-semibold text-white block mb-0.5">MVP Demonstration Mode:</span>
-              Prices and inventory shown represent calibrated testing data for competition and agribusiness evaluation.
+              <span className="font-semibold text-white block mb-0.5">Startup Pre-Launch Status:</span>
+              Products are currently Coming Soon while milling setup progresses in Nasarawa State. Pre-orders and bulk inquiries are welcome.
             </div>
           </div>
         </div>

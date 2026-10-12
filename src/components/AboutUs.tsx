@@ -43,6 +43,7 @@ export const AboutUs: React.FC = () => {
               src="https://images.unsplash.com/photo-1594489428504-5c0c480a15fd?auto=format&fit=crop&w=1000&q=80"
               alt="Harvested rice crops ready for processing in Nigeria"
               className="w-full h-80 sm:h-96 object-cover"
+              referrerPolicy="no-referrer"
             />
             <div className="absolute inset-0 bg-linear-to-t from-[#174D36]/80 via-transparent to-transparent flex items-end p-6">
               <p className="text-xs text-white/90 font-medium">

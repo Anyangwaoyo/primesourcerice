@@ -1,436 +1,411 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useApp } from '../context/AppContext.tsx';
-import { useCart } from '../context/CartContext.tsx';
-import { Product, PackageSize } from '../types/index.ts';
-import { fetchProducts } from '../services/api.ts';
+import { createInquiry } from '../services/api.ts';
 import {
-  ShoppingBag,
-  SlidersHorizontal,
-  Search,
-  CheckCircle2,
-  ShieldCheck,
   Wheat,
   Clock,
-  ArrowRight,
+  ShieldCheck,
+  Package,
+  Truck,
+  CheckCircle2,
   Info,
-  X,
-  Truck
+  MessageCircle,
+  ExternalLink,
+  Phone,
+  Send
 } from 'lucide-react';
 
+interface PackagingSpec {
+  size: string;
+  category: string;
+  bagType: string;
+  grainType: string;
+  destoningPurity: string;
+  moistureContent: string;
+  brokenRatio: string;
+  recommendedFor: string;
+  highlight: string;
+}
+
+const UPCOMING_PACKAGING_SPECS: PackagingSpec[] = [
+  {
+    size: '5kg',
+    category: 'Small Household & Student Pack',
+    bagType: 'Airtight packaging with hermetic inner moisture seal',
+    grainType: 'Premium Long Grain Parboiled (Faro 44)',
+    destoningPurity: '99.8% Sortex Stone-Free',
+    moistureContent: '12.8% (optimal for shelf storage)',
+    brokenRatio: '< 4% Broken',
+    recommendedFor: 'Students, young professionals, and compact household cooking',
+    highlight: 'Convenient carry size, fast cooking, fresh grain aroma',
+  },
+  {
+    size: '10kg',
+    category: 'Everyday Family Pack',
+    bagType: 'Reinforced woven carry bag with ergonomic handle',
+    grainType: 'Premium Long Grain Parboiled',
+    destoningPurity: '99.8% Sortex Stone-Free',
+    moistureContent: '13.0%',
+    brokenRatio: '< 4% Broken',
+    recommendedFor: 'Standard family weekly meals and medium households',
+    highlight: 'High swelling yield, uniform grain length, zero sand/stones',
+  },
+  {
+    size: '25kg',
+    category: 'Household & Catering Standard',
+    bagType: 'Heavy-duty food-grade woven polypropylene bag',
+    grainType: 'Premium Long Grain Parboiled',
+    destoningPurity: '99.9% Sortex Stone-Free',
+    moistureContent: '12.5%',
+    brokenRatio: '< 3.5% Broken',
+    recommendedFor: 'Large households, party caterers, restaurants, and festivities',
+    highlight: 'The Nigerian party favorite: non-sticky grain separation for Jollof & Fried Rice',
+  },
+  {
+    size: '50kg',
+    category: 'Commercial Wholesale Sack',
+    bagType: 'Commercial heavy-duty UV woven polypropylene sack',
+    grainType: 'Premium Long Grain Parboiled',
+    destoningPurity: '99.8% Sortex Stone-Free',
+    moistureContent: '13.2%',
+    brokenRatio: '< 5% Broken',
+    recommendedFor: 'Grain wholesalers, supermarket distributors, institutions, and bulk catering',
+    highlight: 'Palletized bulk haulage, tiered volume pricing for 20+ bags',
+  },
+];
+
 export const Shop: React.FC = () => {
-  const { selectedProduct, setSelectedProduct, settings } = useApp();
-  const { addToCart } = useCart();
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [sizeFilter, setSizeFilter] = useState<string>('all');
-  const [sortOrder, setSortOrder] = useState<'default' | 'price-asc' | 'price-desc'>('default');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [quantities, setQuantities] = useState<Record<string, number>>({});
-  const [detailQuantity, setDetailQuantity] = useState(1);
+  const { settings, showToast } = useApp();
 
-  useEffect(() => {
-    fetchProducts()
-      .then((data) => {
-        setProducts(data);
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error('Error loading shop products:', err);
-        setLoading(false);
+  // Pre-order form state
+  const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [preferredSize, setPreferredSize] = useState('25kg');
+  const [location, setLocation] = useState('Lafia');
+  const [notes, setNotes] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+
+  const rawPhone = (settings?.whatsapp || '07030881613').replace(/[^0-9]/g, '');
+
+  const handleFormSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!name.trim() || !phone.trim()) {
+      showToast('Please provide your name and phone/WhatsApp number.', 'error');
+      return;
+    }
+
+    try {
+      setSubmitting(true);
+      await createInquiry({
+        name: name.trim(),
+        phone: phone.trim(),
+        email: '',
+        subject: `Pre-Order Waitlist: ${preferredSize} Bag (${location})`,
+        message: `Customer joined pre-order launch waitlist. Preferred size: ${preferredSize}. Delivery target: ${location}. Additional note: ${notes.trim() || 'None'}.`,
       });
-  }, []);
-
-  const handleQtyChange = (productId: string, delta: number) => {
-    setQuantities((prev) => {
-      const current = prev[productId] || 1;
-      const next = Math.max(1, current + delta);
-      return { ...prev, [productId]: next };
-    });
+      setSubmitted(true);
+      showToast('Thank you! Your pre-order interest has been registered successfully.', 'success');
+      setName('');
+      setPhone('');
+      setNotes('');
+    } catch (err: any) {
+      console.error('Waitlist submission failed:', err);
+      showToast(err.message || 'Submission failed. Please message us directly on WhatsApp.', 'error');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
-  const getProductQty = (productId: string) => quantities[productId] || 1;
+  const handleDirectWhatsApp = (sizeChoice: string) => {
+    const msg = `Hello PrimeSource Rice! 🌾
+I would like to register my pre-order interest for your upcoming *${sizeChoice}* bag when commercial milling opens in Nasarawa State.
 
-  const filteredProducts = products.filter((p) => {
-    if (sizeFilter !== 'all' && p.size !== sizeFilter) return false;
-    if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase();
-      const matchName = p.name.toLowerCase().includes(q);
-      const matchDesc = p.description.toLowerCase().includes(q);
-      const matchGrain = p.grainType.toLowerCase().includes(q);
-      if (!matchName && !matchDesc && !matchGrain) return false;
-    }
-    return true;
-  });
-
-  const sortedProducts = [...filteredProducts].sort((a, b) => {
-    if (sortOrder === 'price-asc') return a.price - b.price;
-    if (sortOrder === 'price-desc') return b.price - a.price;
-    return 0;
-  });
-
-  const availableSizes: { label: string; value: string }[] = [
-    { label: 'All Packaging Sizes', value: 'all' },
-    { label: '5kg Packs', value: '5kg' },
-    { label: '10kg Bags', value: '10kg' },
-    { label: '25kg Bags', value: '25kg' },
-    { label: '50kg Sacks', value: '50kg' },
-  ];
+Name:
+Location:
+Estimated Quantity:
+Please notify me with official prices upon launch. Thank you!`;
+    window.open(`https://wa.me/${rawPhone}?text=${encodeURIComponent(msg)}`, '_blank');
+  };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-10">
-      {/* Title & MVP Demo Notice Header */}
-      <div>
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-6 border-b border-[#EAE6DD]">
-          <div>
-            <span className="text-xs font-bold uppercase tracking-wider text-[#C69C48]">
-              Product Catalogue
-            </span>
-            <h1 className="text-3xl sm:text-4xl font-extrabold text-[#174D36] tracking-tight mt-1">
-              Shop PrimeSource Rice
-            </h1>
-            <p className="text-sm text-[#555C57] mt-1.5 max-w-2xl">
-              100% stone-free, precision-parboiled long-grain rice grown by local farmers in Nasarawa State. Select your preferred packaging size below.
-            </p>
-          </div>
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 space-y-12">
+      {/* 1. HEADER & PRE-LAUNCH ANNOUNCEMENT */}
+      <div className="space-y-4">
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#C69C48]/20 text-[#174D36] text-xs font-bold uppercase tracking-wider">
+          <Clock className="w-3.5 h-3.5 text-[#C69C48]" />
+          <span>Milling In Preparation · Products Launching Soon</span>
+        </div>
+        <h1 className="text-3xl sm:text-5xl font-extrabold text-[#174D36] tracking-tight">
+          Upcoming Products & Specifications
+        </h1>
+        <p className="text-sm sm:text-base text-[#555C57] leading-relaxed max-w-3xl">
+          PrimeSource Rice is currently in its active harvest parboiling, de-stoning, and facility calibration phase in Assakio-Lafia, Nasarawa State. In line with our agribusiness integrity, no products are uploaded for retail cart checkout yet. Review our upcoming package specifications and reserve priority allocation below.
+        </p>
 
-          {/* Sample Pricing Notice Badge */}
-          <div className="bg-[#F3EFE6] border border-[#E2DFD8] rounded-xl p-3 text-xs text-[#555C57] max-w-sm flex items-start gap-2">
-            <Info className="w-4 h-4 text-[#174D36] shrink-0 mt-0.5" />
+        {/* Agribusiness Integrity Banner */}
+        <div className="p-4 rounded-2xl bg-[#FAF9F6] border border-[#EAE6DD] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-xs text-[#555C57] mt-4">
+          <div className="flex items-center gap-2.5">
+            <Info className="w-4 h-4 text-[#C69C48] shrink-0" />
             <span>
-              <strong>Demonstration Prices:</strong> The prices below represent calibrated development sample prices for MVP testing and quotation evaluation.
+              <strong>Zero False Stock:</strong> Direct purchases will go live immediately once automated bagging commences. Early reservations are non-binding.
             </span>
           </div>
-        </div>
-      </div>
-
-      {/* Filter and Search Bar */}
-      <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4 bg-white p-4 rounded-2xl border border-[#EAE6DD] shadow-xs">
-        {/* Package Size Tabs */}
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-2 lg:pb-0 scrollbar-none">
-          {availableSizes.map((size) => (
-            <button
-              key={size.value}
-              onClick={() => setSizeFilter(size.value)}
-              className={`px-3.5 py-2 text-xs font-semibold rounded-lg whitespace-nowrap transition-colors cursor-pointer ${
-                sizeFilter === size.value
-                  ? 'bg-[#174D36] text-white shadow-xs'
-                  : 'bg-[#FAF9F6] text-[#555C57] hover:bg-[#F3EFE6] hover:text-[#174D36]'
-              }`}
-            >
-              {size.label}
-            </button>
-          ))}
-        </div>
-
-        {/* Search & Sort Controls */}
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-          <div className="relative flex-1 sm:w-64">
-            <Search className="w-4 h-4 text-[#8C948E] absolute left-3 top-1/2 -translate-y-1/2" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search rice packages..."
-              className="w-full pl-9 pr-3 py-2 text-xs bg-[#FAF9F6] border border-[#E2DFD8] rounded-lg focus:outline-none focus:ring-1 focus:ring-[#174D36] text-[#242A26]"
-            />
-            {searchQuery && (
-              <button
-                onClick={() => setSearchQuery('')}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-neutral-400 hover:text-neutral-700"
-              >
-                <X className="w-3.5 h-3.5" />
-              </button>
-            )}
-          </div>
-
-          <div className="flex items-center gap-2">
-            <SlidersHorizontal className="w-3.5 h-3.5 text-[#6B726A]" />
-            <select
-              value={sortOrder}
-              onChange={(e) => setSortOrder(e.target.value as any)}
-              className="px-3 py-2 text-xs bg-[#FAF9F6] border border-[#E2DFD8] rounded-lg text-[#242A26] focus:outline-none focus:ring-1 focus:ring-[#174D36] cursor-pointer"
-            >
-              <option value="default">Sort: Default order</option>
-              <option value="price-asc">Price: Low to High</option>
-              <option value="price-desc">Price: High to Low</option>
-            </select>
-          </div>
-        </div>
-      </div>
-
-      {/* Products Grid */}
-      {loading ? (
-        <div className="py-20 text-center text-sm text-[#6B726A]">
-          Loading products...
-        </div>
-      ) : sortedProducts.length === 0 ? (
-        <div className="py-20 text-center bg-white rounded-2xl border border-[#EAE6DD] p-8">
-          <Wheat className="w-12 h-12 text-[#C69C48] mx-auto mb-3" />
-          <h3 className="text-lg font-bold text-[#174D36]">No products match your filter</h3>
-          <p className="text-xs text-[#6B726A] mt-1 mb-4">Try clearing your search query or selecting a different package size.</p>
           <button
-            onClick={() => {
-              setSizeFilter('all');
-              setSearchQuery('');
-            }}
-            className="px-4 py-2 text-xs font-semibold bg-[#174D36] text-white rounded-lg cursor-pointer"
+            onClick={() => handleDirectWhatsApp('General')}
+            className="shrink-0 px-4 py-2 bg-[#25D366] hover:bg-[#1EBE5D] text-white font-bold rounded-xl transition-colors flex items-center gap-1.5 cursor-pointer text-xs"
           >
-            Reset Filters
+            <MessageCircle className="w-3.5 h-3.5" />
+            <span>WhatsApp Sales Desk</span>
           </button>
         </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
-          {sortedProducts.map((product) => {
-            const qty = getProductQty(product.id);
-            return (
-              <div
-                key={product.id}
-                className="bg-white rounded-2xl border border-[#EAE6DD] overflow-hidden flex flex-col justify-between shadow-xs hover:border-[#174D36]/40 hover:shadow-md transition-all group"
-              >
-                {/* Product Image */}
-                <div
-                  onClick={() => setSelectedProduct(product)}
-                  className="relative aspect-4/3 bg-[#F3EFE6] overflow-hidden cursor-pointer"
-                >
-                  <img
-                    src={product.imageUrl}
-                    alt={product.name}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-                  <div className="absolute top-3 right-3 bg-[#174D36] text-white text-xs font-bold px-2.5 py-1 rounded-md shadow-xs">
-                    {product.size}
-                  </div>
-                  <div className="absolute bottom-3 left-3 bg-white/95 backdrop-blur-xs text-[#174D36] text-[11px] font-semibold px-2 py-0.5 rounded-sm">
-                    {product.inStock ? `In Stock (${product.stockCount} bags)` : 'Low Stock / Pre-order'}
-                  </div>
-                </div>
+      </div>
 
-                {/* Details */}
-                <div className="p-5 flex-1 flex flex-col justify-between">
-                  <div>
-                    <h3
-                      onClick={() => setSelectedProduct(product)}
-                      className="font-bold text-[#174D36] text-base leading-snug hover:underline cursor-pointer mb-1.5"
-                    >
-                      {product.name}
-                    </h3>
-                    <p className="text-xs text-[#555C57] line-clamp-2 mb-3">
-                      {product.shortDescription}
-                    </p>
-
-                    {/* Specifications metadata */}
-                    <div className="text-[11px] text-[#6B726A] space-y-1 mb-4 bg-[#FAF9F6] p-2.5 rounded-lg border border-[#F3EFE6]">
-                      <div className="flex justify-between">
-                        <span className="text-neutral-500">Grain Type:</span>
-                        <span className="font-medium text-[#242A26]">{product.grainType}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-neutral-500">Purity / De-stoning:</span>
-                        <span className="font-medium text-[#174D36]">{product.purityPercentage}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-neutral-500">Broken Ratio:</span>
-                        <span className="font-medium text-[#242A26]">{product.brokenRatio}</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="pt-3 border-t border-[#F3EFE6] space-y-3">
-                    <div className="flex items-baseline justify-between">
-                      <div>
-                        <span className="text-[10px] uppercase tracking-wider text-[#6B726A]">Price per bag</span>
-                        <div className="text-2xl font-extrabold text-[#174D36]">
-                          ₦{product.price.toLocaleString('en-NG')}
-                        </div>
-                      </div>
-                      <button
-                        onClick={() => setSelectedProduct(product)}
-                        className="text-xs font-semibold text-[#C69C48] hover:text-[#A57F32] cursor-pointer"
-                      >
-                        Specs & Guide →
-                      </button>
-                    </div>
-
-                    {/* Quantity Selector & Add to Cart */}
-                    <div className="flex items-center gap-2">
-                      <div className="flex items-center border border-[#E2DFD8] rounded-lg bg-[#FAF9F6] overflow-hidden">
-                        <button
-                          onClick={() => handleQtyChange(product.id, -1)}
-                          className="px-2.5 py-2 text-xs font-bold text-[#555C57] hover:bg-[#EAE6DD] cursor-pointer"
-                        >
-                          -
-                        </button>
-                        <span className="px-3 py-2 text-xs font-bold text-[#174D36] min-w-8 text-center">
-                          {qty}
-                        </span>
-                        <button
-                          onClick={() => handleQtyChange(product.id, 1)}
-                          className="px-2.5 py-2 text-xs font-bold text-[#555C57] hover:bg-[#EAE6DD] cursor-pointer"
-                        >
-                          +
-                        </button>
-                      </div>
-
-                      <button
-                        onClick={() => addToCart(product, qty)}
-                        className="flex-1 py-2.5 px-3 text-xs font-bold text-white bg-[#174D36] hover:bg-[#0F3324] rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-xs active:scale-95"
-                      >
-                        <ShoppingBag className="w-3.5 h-3.5 text-[#C69C48]" />
-                        <span>Add to Cart</span>
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
+      {/* 2. UPCOMING PACKAGING SPECIFICATIONS (STRUCTURED DIRECTORY - NO PRODUCT CARDS) */}
+      <div className="space-y-6">
+        <div className="border-b border-[#EAE6DD] pb-4 flex items-center justify-between">
+          <div>
+            <h2 className="text-xl sm:text-2xl font-extrabold text-[#174D36]">
+              Packaging Sizes & Quality Specifications
+            </h2>
+            <p className="text-xs text-[#6B726A] mt-0.5">
+              Automated de-stoning, moisture calibration & packaging standards for our upcoming release.
+            </p>
+          </div>
+          <span className="text-xs font-bold text-[#C69C48] bg-[#C69C48]/15 px-3 py-1 rounded-full hidden sm:inline-block">
+            4 Upcoming Sizes
+          </span>
         </div>
-      )}
 
-      {/* PAGE 3: PRODUCT DETAIL MODAL / POPUP */}
-      {selectedProduct && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
-          <div className="bg-white rounded-3xl max-w-4xl w-full max-h-[92vh] overflow-y-auto border border-[#EAE6DD] shadow-2xl relative">
-            {/* Close Button */}
-            <button
-              onClick={() => setSelectedProduct(null)}
-              className="absolute top-4 right-4 z-10 w-9 h-9 rounded-full bg-white/90 border border-[#E2DFD8] text-[#242A26] hover:bg-neutral-100 flex items-center justify-center cursor-pointer shadow-xs"
-              aria-label="Close Product Details"
-            >
-              <X className="w-5 h-5" />
-            </button>
-
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-8 p-6 sm:p-10">
-              {/* Product Large Image */}
-              <div className="md:col-span-5 space-y-4">
-                <div className="rounded-2xl overflow-hidden aspect-4/3 bg-[#F3EFE6] border border-[#EAE6DD] relative">
-                  <img
-                    src={selectedProduct.imageUrl}
-                    alt={selectedProduct.name}
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute top-3 left-3 bg-[#174D36] text-white text-xs font-bold px-3 py-1 rounded-md shadow-xs">
-                    {selectedProduct.size} Bag
+        {/* Specifications List */}
+        <div className="divide-y divide-[#EAE6DD] border border-[#EAE6DD] rounded-2xl bg-white overflow-hidden shadow-xs">
+          {UPCOMING_PACKAGING_SPECS.map((spec) => (
+            <div key={spec.size} className="p-5 sm:p-7 hover:bg-[#FAF9F6] transition-colors">
+              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+                {/* Left: Size info */}
+                <div className="space-y-2 lg:max-w-md">
+                  <div className="flex items-center gap-3">
+                    <span className="w-12 h-12 rounded-xl bg-[#174D36] text-[#C69C48] flex items-center justify-center font-black text-base shrink-0">
+                      {spec.size}
+                    </span>
+                    <div>
+                      <h3 className="font-extrabold text-base text-[#174D36] leading-tight">
+                        {spec.category}
+                      </h3>
+                      <p className="text-xs text-[#C69C48] font-semibold mt-0.5">
+                        Status: Coming Soon · Official Pricing at Launch
+                      </p>
+                    </div>
                   </div>
-                </div>
-
-                <div className="p-4 rounded-xl bg-[#F3EFE6] border border-[#E2DFD8] text-xs space-y-2">
-                  <div className="flex items-center gap-2 font-semibold text-[#174D36]">
-                    <ShieldCheck className="w-4 h-4 text-[#C69C48]" />
-                    <span>PrimeSource Quality Guarantee</span>
-                  </div>
-                  <p className="text-[#555C57] text-[11px] leading-relaxed">
-                    Processed with dual rubber-roller dehuskers and Sortex optical sensors to eliminate stones, chaff, and dark grains.
+                  <p className="text-xs text-[#555C57] leading-relaxed pt-1">
+                    {spec.highlight}
+                  </p>
+                  <p className="text-[11px] text-[#6B726A]">
+                    <strong>Bag Type:</strong> {spec.bagType}
                   </p>
                 </div>
-              </div>
 
-              {/* Product Information & Purchasing */}
-              <div className="md:col-span-7 space-y-5">
-                <div>
-                  <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#C69C48] mb-1">
-                    <span>{selectedProduct.origin}</span>
+                {/* Center: Technical Milling Metrics */}
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs bg-[#FAF9F6] p-4 rounded-xl border border-[#EAE6DD] lg:w-96">
+                  <div>
+                    <span className="text-[10px] uppercase font-semibold text-[#8C948E] block">Grain Type</span>
+                    <span className="font-bold text-[#242A26]">{spec.grainType}</span>
                   </div>
-                  <h2 className="text-2xl sm:text-3xl font-extrabold text-[#174D36]">
-                    {selectedProduct.name}
-                  </h2>
-                  <div className="flex items-baseline gap-3 mt-3">
-                    <span className="text-3xl font-extrabold text-[#174D36]">
-                      ₦{selectedProduct.price.toLocaleString('en-NG')}
-                    </span>
-                    <span className="text-xs text-[#6B726A]">Sample Demonstration Price</span>
+                  <div>
+                    <span className="text-[10px] uppercase font-semibold text-[#8C948E] block">De-stoning</span>
+                    <span className="font-bold text-[#174D36]">{spec.destoningPurity}</span>
                   </div>
-                </div>
-
-                <p className="text-sm text-[#4A524D] leading-relaxed">
-                  {selectedProduct.description}
-                </p>
-
-                {/* Technical Specifications Table */}
-                <div>
-                  <h4 className="text-xs font-bold uppercase tracking-wider text-[#174D36] mb-2">
-                    Quality Specifications
-                  </h4>
-                  <div className="grid grid-cols-2 gap-2 text-xs bg-[#FAF9F6] p-3.5 rounded-xl border border-[#EAE6DD]">
-                    <div>
-                      <span className="text-neutral-500 block text-[10px]">Grain Classification</span>
-                      <strong className="text-[#242A26]">{selectedProduct.grainType}</strong>
-                    </div>
-                    <div>
-                      <span className="text-neutral-500 block text-[10px]">De-stoning & Purity</span>
-                      <strong className="text-[#174D36]">{selectedProduct.purityPercentage}</strong>
-                    </div>
-                    <div>
-                      <span className="text-neutral-500 block text-[10px]">Broken Ratio</span>
-                      <strong className="text-[#242A26]">{selectedProduct.brokenRatio}</strong>
-                    </div>
-                    <div>
-                      <span className="text-neutral-500 block text-[10px]">Moisture Level</span>
-                      <strong className="text-[#242A26]">{selectedProduct.moistureContent}</strong>
-                    </div>
+                  <div>
+                    <span className="text-[10px] uppercase font-semibold text-[#8C948E] block">Moisture</span>
+                    <span className="font-bold text-[#242A26]">{spec.moistureContent}</span>
+                  </div>
+                  <div className="sm:col-span-3 pt-1 border-t border-[#EAE6DD]">
+                    <span className="text-[10px] uppercase font-semibold text-[#8C948E] block">Recommended Use</span>
+                    <span className="text-[#4A524D] text-[11px] font-medium">{spec.recommendedFor}</span>
                   </div>
                 </div>
 
-                {/* Storage & Cooking Guide */}
-                <div className="space-y-2 text-xs">
-                  <div className="p-3 bg-white rounded-lg border border-[#EAE6DD]">
-                    <strong className="text-[#174D36] block mb-0.5">Storage Instruction:</strong>
-                    <span className="text-[#555C57]">
-                      Store off bare concrete floors on wooden pallets or racks in a well-ventilated, dry environment away from dampness.
-                    </span>
-                  </div>
-                  <div className="p-3 bg-white rounded-lg border border-[#EAE6DD]">
-                    <strong className="text-[#174D36] block mb-0.5">Cooking Performance:</strong>
-                    <span className="text-[#555C57]">
-                      Requires standard water ratio (1.8 to 2 parts water to 1 part rice). Exceptional expansion ratio without clumping or sogginess.
-                    </span>
-                  </div>
-                </div>
-
-                {/* Delivery Information */}
-                <div className="flex items-center gap-2 text-xs text-[#555C57] pt-1">
-                  <Truck className="w-4 h-4 text-[#C69C48] shrink-0" />
-                  <span>
-                    Available for delivery in Lafia (same day), Doma, Awe, Assakio, and express shipping to Abuja.
-                  </span>
-                </div>
-
-                {/* Quantity & Add to Cart Action */}
-                <div className="pt-4 border-t border-[#EAE6DD] flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-                  <div className="flex items-center border border-[#E2DFD8] rounded-xl bg-[#FAF9F6] overflow-hidden self-start sm:self-auto">
-                    <button
-                      onClick={() => setDetailQuantity((q) => Math.max(1, q - 1))}
-                      className="px-4 py-3 text-sm font-bold text-[#555C57] hover:bg-[#EAE6DD] cursor-pointer"
-                    >
-                      -
-                    </button>
-                    <span className="px-5 py-3 text-sm font-bold text-[#174D36] min-w-10 text-center">
-                      {detailQuantity}
-                    </span>
-                    <button
-                      onClick={() => setDetailQuantity((q) => q + 1)}
-                      className="px-4 py-3 text-sm font-bold text-[#555C57] hover:bg-[#EAE6DD] cursor-pointer"
-                    >
-                      +
-                    </button>
-                  </div>
-
+                {/* Right: Pre-Order Quick Action */}
+                <div className="flex flex-col sm:flex-row lg:flex-col gap-2 shrink-0 justify-center">
                   <button
                     onClick={() => {
-                      addToCart(selectedProduct, detailQuantity);
-                      setSelectedProduct(null);
+                      setPreferredSize(spec.size);
+                      const formEl = document.getElementById('preorder-form');
+                      formEl?.scrollIntoView({ behavior: 'smooth' });
                     }}
-                    className="flex-1 py-3.5 px-6 rounded-xl bg-[#174D36] hover:bg-[#0F3324] text-white font-bold text-sm transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md active:scale-98"
+                    className="px-4 py-2.5 rounded-xl bg-[#174D36] hover:bg-[#0F3324] text-white text-xs font-bold transition-colors cursor-pointer text-center"
                   >
-                    <ShoppingBag className="w-4 h-4 text-[#C69C48]" />
-                    <span>Add {detailQuantity} to Cart (₦{(selectedProduct.price * detailQuantity).toLocaleString('en-NG')})</span>
+                    Select for Waitlist
+                  </button>
+                  <button
+                    onClick={() => handleDirectWhatsApp(spec.size)}
+                    className="px-4 py-2.5 rounded-xl bg-white hover:bg-[#F3EFE6] text-[#174D36] border border-[#174D36]/25 text-xs font-semibold transition-colors cursor-pointer flex items-center justify-center gap-1.5"
+                  >
+                    <MessageCircle className="w-3.5 h-3.5 text-[#25D366]" />
+                    <span>WhatsApp Inquiry</span>
                   </button>
                 </div>
               </div>
             </div>
-          </div>
+          ))}
         </div>
-      )}
+      </div>
+
+      {/* 3. PRE-ORDER WAITLIST REGISTRATION FORM (DIRECTLY ON PAGE - NO MODAL) */}
+      <div id="preorder-form" className="bg-white rounded-3xl border border-[#EAE6DD] p-6 sm:p-10 shadow-xs">
+        <div className="max-w-2xl mx-auto space-y-6">
+          <div className="text-center space-y-2">
+            <div className="w-12 h-12 rounded-2xl bg-[#174D36]/10 text-[#174D36] flex items-center justify-center mx-auto mb-2">
+              <Wheat className="w-6 h-6 text-[#C69C48]" />
+            </div>
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-[#174D36]">
+              Join the Launch Waitlist
+            </h2>
+            <p className="text-xs sm:text-sm text-[#555C57]">
+              Be the first to receive notifications and priority dispatch once commercial bagging goes live. Zero payment required until order confirmation.
+            </p>
+          </div>
+
+          {submitted ? (
+            <div className="p-6 rounded-2xl bg-emerald-50 border border-emerald-200 text-center space-y-3">
+              <CheckCircle2 className="w-10 h-10 text-[#174D36] mx-auto" />
+              <h3 className="font-extrabold text-base text-[#174D36]">You're on the Priority List!</h3>
+              <p className="text-xs text-[#555C57] leading-relaxed max-w-md mx-auto">
+                Thank you for supporting authentic Nigerian agriculture. Our commercial desk will contact you via WhatsApp/SMS prior to our official launch.
+              </p>
+              <button
+                onClick={() => setSubmitted(false)}
+                className="mt-2 px-5 py-2 rounded-xl bg-[#174D36] text-white text-xs font-bold cursor-pointer hover:bg-[#0F3324]"
+              >
+                Register Another Inquiry
+              </button>
+            </div>
+          ) : (
+            <form onSubmit={handleFormSubmit} className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold text-[#174D36] mb-1">
+                    Your Name / Organization *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="e.g., Hajiya Fatima / ABC Catering"
+                    className="w-full px-3.5 py-2.5 text-xs bg-[#FAF9F6] border border-[#E2DFD8] rounded-xl focus:outline-none focus:ring-1 focus:ring-[#174D36] text-[#242A26]"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-[#174D36] mb-1">
+                    Phone / WhatsApp Number *
+                  </label>
+                  <input
+                    type="tel"
+                    required
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    placeholder="e.g., 08012345678"
+                    className="w-full px-3.5 py-2.5 text-xs bg-[#FAF9F6] border border-[#E2DFD8] rounded-xl focus:outline-none focus:ring-1 focus:ring-[#174D36] text-[#242A26]"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold text-[#174D36] mb-1">
+                    Preferred Packaging Size
+                  </label>
+                  <select
+                    value={preferredSize}
+                    onChange={(e) => setPreferredSize(e.target.value)}
+                    className="w-full px-3.5 py-2.5 text-xs bg-[#FAF9F6] border border-[#E2DFD8] rounded-xl focus:outline-none focus:ring-1 focus:ring-[#174D36] text-[#242A26] cursor-pointer"
+                  >
+                    <option value="5kg">5kg Hermetic Pack</option>
+                    <option value="10kg">10kg Everyday Family Bag</option>
+                    <option value="25kg">25kg Catering & Household Standard</option>
+                    <option value="50kg">50kg Wholesale Commercial Sack</option>
+                    <option value="Bulk (20+ bags)">Bulk Commercial Order (20+ bags)</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-[#174D36] mb-1">
+                    Delivery Location Target
+                  </label>
+                  <input
+                    type="text"
+                    value={location}
+                    onChange={(e) => setLocation(e.target.value)}
+                    placeholder="e.g., Lafia GRA, Doma, Abuja Central"
+                    className="w-full px-3.5 py-2.5 text-xs bg-[#FAF9F6] border border-[#E2DFD8] rounded-xl focus:outline-none focus:ring-1 focus:ring-[#174D36] text-[#242A26]"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-[#174D36] mb-1">
+                  Optional Note / Estimated Quantity Needed
+                </label>
+                <textarea
+                  rows={2}
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  placeholder="e.g., Looking for 5 bags of 25kg for family consumption in Abuja..."
+                  className="w-full px-3.5 py-2.5 text-xs bg-[#FAF9F6] border border-[#E2DFD8] rounded-xl focus:outline-none focus:ring-1 focus:ring-[#174D36] text-[#242A26]"
+                />
+              </div>
+
+              <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  className="flex-1 py-3.5 px-6 rounded-xl bg-[#174D36] hover:bg-[#0F3324] text-white font-bold text-xs sm:text-sm transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-md disabled:opacity-50"
+                >
+                  <Send className="w-4 h-4 text-[#C69C48]" />
+                  <span>{submitting ? 'Registering...' : 'Register for Launch Notification'}</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleDirectWhatsApp(preferredSize)}
+                  className="px-6 py-3.5 rounded-xl bg-[#25D366] hover:bg-[#1EBE5D] text-white font-bold text-xs sm:text-sm transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-xs"
+                >
+                  <MessageCircle className="w-4 h-4" />
+                  <span>WhatsApp Instead</span>
+                </button>
+              </div>
+            </form>
+          )}
+        </div>
+      </div>
+
+      {/* 4. COMMERCIAL & B2B DIRECT DESK */}
+      <div className="p-6 sm:p-8 rounded-3xl bg-[#174D36] text-white flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+        <div className="space-y-2 max-w-xl">
+          <span className="text-xs font-bold uppercase tracking-wider text-[#DFBA6D] flex items-center gap-1.5">
+            <Truck className="w-4 h-4 text-[#C69C48]" />
+            Commercial Wholesale & Institutions
+          </span>
+          <h3 className="text-xl sm:text-2xl font-bold">
+            Supplying 20 to 1,000+ Bags for Businesses
+          </h3>
+          <p className="text-xs sm:text-sm text-[#D5D0C3] leading-relaxed">
+            Are you a supermarket chain, school cafeteria, hotel caterer, or rice wholesaler? We provide volume contracts, palletized delivery, and depot off-take in Nasarawa & Abuja.
+          </p>
+        </div>
+
+        <button
+          onClick={() => {
+            window.location.hash = '';
+            const msg = `Hello PrimeSource Rice! 🌾 I represent a commercial business and would like to inquire about volume supply contracts for 20+ bags.`;
+            window.open(`https://wa.me/${rawPhone}?text=${encodeURIComponent(msg)}`, '_blank');
+          }}
+          className="px-6 py-3 rounded-xl bg-[#C69C48] hover:bg-[#A57F32] text-[#174D36] font-bold text-xs sm:text-sm transition-colors shrink-0 cursor-pointer shadow-sm"
+        >
+          Request Commercial Haulage Quote
+        </button>
+      </div>
     </div>
   );
 };

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useApp, PageView } from '../context/AppContext.tsx';
 import { useCart } from '../context/CartContext.tsx';
-import { ShoppingBag, Menu, X, ShieldCheck, Phone, Wheat } from 'lucide-react';
+import { Clock, Menu, X, ShieldCheck, Phone, Wheat } from 'lucide-react';
 
 export const Header: React.FC = () => {
   const { currentPage, setCurrentPage, settings } = useApp();
@@ -10,7 +10,7 @@ export const Header: React.FC = () => {
 
   const navItems: { label: string; page: PageView }[] = [
     { label: 'Home', page: 'home' },
-    { label: 'Shop Rice', page: 'shop' },
+    { label: 'Products', page: 'shop' },
     { label: 'Bulk Orders', page: 'bulk-orders' },
     { label: 'About Us', page: 'about' },
     { label: 'Contact', page: 'contact' },
@@ -89,19 +89,14 @@ export const Header: React.FC = () => {
               <span className="hidden lg:inline text-xs">Admin</span>
             </button>
 
-            {/* Shopping Cart Button */}
+            {/* Pre-Order Launch Button */}
             <button
               onClick={() => setIsCartOpen(true)}
-              className="relative p-2.5 rounded-lg bg-[#174D36] text-white hover:bg-[#0F3324] transition-all flex items-center gap-2 cursor-pointer shadow-xs active:scale-95"
-              aria-label="Shopping Cart"
+              className="relative p-2.5 sm:px-3 sm:py-2 rounded-lg bg-[#174D36] text-white hover:bg-[#0F3324] transition-all flex items-center gap-1.5 cursor-pointer shadow-xs active:scale-95"
+              aria-label="Pre-Order Launch Information"
             >
-              <ShoppingBag className="w-4 h-4 text-[#C69C48]" />
-              <span className="text-xs font-semibold hidden sm:inline">Cart</span>
-              {cartCount > 0 && (
-                <span className="absolute -top-1.5 -right-1.5 bg-[#C69C48] text-[#174D36] font-bold text-xs rounded-full w-5 h-5 flex items-center justify-center border-2 border-white shadow-xs">
-                  {cartCount}
-                </span>
-              )}
+              <Clock className="w-4 h-4 text-[#C69C48]" />
+              <span className="text-xs font-semibold hidden sm:inline">Pre-Order</span>
             </button>
 
             {/* Mobile Menu Button */}

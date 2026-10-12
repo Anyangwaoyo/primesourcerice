@@ -1,8 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { useApp } from '../context/AppContext.tsx';
-import { useCart } from '../context/CartContext.tsx';
-import { Product } from '../types/index.ts';
-import { fetchProducts } from '../services/api.ts';
 import {
   Wheat,
   ShieldCheck,
@@ -13,149 +10,100 @@ import {
   CheckCircle2,
   Users,
   ChevronRight,
-  Eye,
-  ShoppingBag
+  Clock
 } from 'lucide-react';
 
 export const Home: React.FC = () => {
-  const { setCurrentPage, setSelectedProduct } = useApp();
-  const { addToCart } = useCart();
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    let mounted = true;
-    fetchProducts()
-      .then((data) => {
-        if (mounted) {
-          setProducts(data);
-          setLoading(false);
-        }
-      })
-      .catch((err) => {
-        console.error('Failed to load products on home:', err);
-        if (mounted) setLoading(false);
-      });
-    return () => {
-      mounted = false;
-    };
-  }, []);
-
-  const handleProductClick = (product: Product) => {
-    setSelectedProduct(product);
-    setCurrentPage('shop');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
+  const { setCurrentPage } = useApp();
 
   return (
     <div className="space-y-20 sm:space-y-28">
-      {/* 1. HERO SECTION */}
-      <section className="relative overflow-hidden pt-8 sm:pt-14 pb-12 sm:pb-20 bg-linear-to-b from-[#F3EFE6]/60 via-[#FAF9F6] to-[#FAF9F6]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
-            {/* Left Column: Copy & Actions */}
-            <div className="lg:col-span-7 space-y-6 sm:space-y-8">
-              {/* Headline */}
-              <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-[#174D36] tracking-tight leading-[1.12]">
-                Quality Nigerian Rice, From Our Farms to Your Table.
-              </h1>
+      {/* 1. HERO SECTION (NO IMAGES) */}
+      <section className="relative overflow-hidden pt-10 sm:pt-16 pb-14 sm:pb-22 bg-linear-to-b from-[#F3EFE6]/60 via-[#FAF9F6] to-[#FAF9F6]">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          {/* Top Status Pill */}
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#174D36]/10 text-[#174D36] text-xs font-bold uppercase tracking-wider mb-6 border border-[#174D36]/20">
+            <Clock className="w-3.5 h-3.5 text-[#C69C48]" />
+            <span>Nasarawa Agrarian Heartland · Products Launching Soon</span>
+          </div>
 
-              {/* Supporting Text */}
-              <p className="text-base sm:text-lg text-[#4A524D] leading-relaxed max-w-2xl font-normal">
-                We source locally grown paddy rice, process it with care and deliver clean, quality rice to homes and businesses. Enjoy authentic Nigerian rice that cooks with exceptional aroma, fluffy grain separation, and zero stones.
-              </p>
+          {/* Headline */}
+          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-[#174D36] tracking-tight leading-[1.12] max-w-4xl mx-auto">
+            Quality Nigerian Rice, From Our Farms to Your Table.
+          </h1>
 
-              {/* Key Trust Checkmarks */}
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-2 text-xs text-[#242A26] font-medium">
-                <div className="flex items-center gap-1.5">
-                  <CheckCircle2 className="w-4 h-4 text-[#174D36] shrink-0" />
-                  <span>De-stoned & Sortex clean</span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <CheckCircle2 className="w-4 h-4 text-[#174D36] shrink-0" />
-                  <span>Moisture controlled &lt;14%</span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <CheckCircle2 className="w-4 h-4 text-[#174D36] shrink-0" />
-                  <span>Local farmer empowered</span>
-                </div>
-              </div>
+          {/* Supporting Text */}
+          <p className="text-base sm:text-lg text-[#4A524D] leading-relaxed max-w-2xl mx-auto mt-6 font-normal">
+            We source locally grown paddy rice, process it with care and deliver clean, quality rice to homes and businesses. Enjoy authentic Nigerian rice that cooks with exceptional aroma, fluffy grain separation, and zero stones.
+          </p>
 
-              {/* CTAs */}
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 pt-4">
-                <button
-                  onClick={() => {
-                    setCurrentPage('shop');
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                  }}
-                  className="px-7 py-3.5 rounded-xl bg-[#174D36] hover:bg-[#0F3324] text-white font-semibold text-sm sm:text-base transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer active:scale-98"
-                >
-                  <ShoppingBag className="w-5 h-5 text-[#C69C48]" />
-                  <span>Shop Rice</span>
-                  <ArrowRight className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={() => {
-                    setCurrentPage('bulk-orders');
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                  }}
-                  className="px-7 py-3.5 rounded-xl bg-white hover:bg-[#F3EFE6] text-[#174D36] border border-[#174D36]/25 font-semibold text-sm sm:text-base transition-all shadow-xs flex items-center justify-center gap-2 cursor-pointer active:scale-98"
-                >
-                  <Truck className="w-5 h-5 text-[#C69C48]" />
-                  <span>Order in Bulk</span>
-                </button>
-              </div>
-
-              {/* Geographic availability note */}
-              <p className="text-xs text-[#6B726A] pt-1">
-                Fast local delivery in Lafia, Doma, Awe, Ashagwa, Assakio, plus scheduled dispatch to Abuja & nationwide bulk haulage.
-              </p>
+          {/* Key Trust Checkmarks */}
+          <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 pt-6 text-xs text-[#242A26] font-medium">
+            <div className="flex items-center gap-1.5 bg-white px-3.5 py-1.5 rounded-full border border-[#EAE6DD] shadow-2xs">
+              <CheckCircle2 className="w-4 h-4 text-[#174D36] shrink-0" />
+              <span>De-stoned & Sortex clean</span>
             </div>
+            <div className="flex items-center gap-1.5 bg-white px-3.5 py-1.5 rounded-full border border-[#EAE6DD] shadow-2xs">
+              <CheckCircle2 className="w-4 h-4 text-[#174D36] shrink-0" />
+              <span>Moisture controlled &lt;14%</span>
+            </div>
+            <div className="flex items-center gap-1.5 bg-white px-3.5 py-1.5 rounded-full border border-[#EAE6DD] shadow-2xs">
+              <CheckCircle2 className="w-4 h-4 text-[#174D36] shrink-0" />
+              <span>Local farmer empowered</span>
+            </div>
+          </div>
 
-            {/* Right Column: High Quality Realistic Photography Visual */}
-            <div className="lg:col-span-5 relative">
-              <div className="relative mx-auto max-w-md lg:max-w-none">
-                {/* Accent border backdrop */}
-                <div className="absolute -inset-2 rounded-2xl bg-linear-to-tr from-[#174D36]/15 via-[#C69C48]/20 to-[#174D36]/10 transform rotate-1 blur-xs" />
+          {/* CTAs */}
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 pt-8">
+            <button
+              onClick={() => {
+                setCurrentPage('shop');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+              className="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-[#174D36] hover:bg-[#0F3324] text-white font-semibold text-sm sm:text-base transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer active:scale-98"
+            >
+              <Clock className="w-5 h-5 text-[#C69C48]" />
+              <span>Pre-Order Launch Waitlist</span>
+              <ArrowRight className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => {
+                setCurrentPage('bulk-orders');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+              className="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-white hover:bg-[#F3EFE6] text-[#174D36] border border-[#174D36]/25 font-semibold text-sm sm:text-base transition-all shadow-xs flex items-center justify-center gap-2 cursor-pointer active:scale-98"
+            >
+              <Truck className="w-5 h-5 text-[#C69C48]" />
+              <span>Order in Bulk</span>
+            </button>
+          </div>
 
-                {/* Main Card Frame */}
-                <div className="relative rounded-2xl overflow-hidden shadow-xl border border-[#E2DFD8] bg-white">
-                  <img
-                    src="https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=1000&q=80"
-                    alt="Nigerian milled parboiled rice in woven bag"
-                    className="w-full h-80 sm:h-96 object-cover object-center transform hover:scale-102 transition-transform duration-500"
-                  />
+          {/* Geographic availability note */}
+          <p className="text-xs text-[#6B726A] pt-4 max-w-xl mx-auto">
+            Fast local delivery in Lafia, Doma, Awe, Ashagwa, Assakio, plus scheduled dispatch to Abuja & nationwide bulk haulage.
+          </p>
 
-                  {/* Floating quality stamp on image */}
-                  <div className="absolute top-4 left-4 bg-white/95 backdrop-blur-md px-3 py-1.5 rounded-lg border border-[#E2DFD8] shadow-sm flex items-center gap-2">
-                    <Sparkles className="w-4 h-4 text-[#C69C48]" />
-                    <span className="text-xs font-bold text-[#174D36]">Grade 1 Parboiled Rice</span>
-                  </div>
-
-                  {/* Bottom Image Caption Bar */}
-                  <div className="p-4 bg-white border-t border-[#EAE6DD] flex items-center justify-between">
-                    <div>
-                      <p className="text-xs text-[#6B726A]">Origin: Nasarawa Agrarian Plains</p>
-                      <p className="text-sm font-bold text-[#174D36]">Faro 44 & Jasmine Parboiled</p>
-                    </div>
-                    <div className="text-right">
-                      <span className="text-xs text-[#6B726A]">Starting from</span>
-                      <p className="text-base font-extrabold text-[#C69C48]">₦7,500</p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Floating Metric Pill on bottom-left */}
-                <div className="absolute -bottom-5 -left-4 sm:-left-6 bg-[#174D36] text-white p-3.5 rounded-xl shadow-lg border border-[#226B4C] flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-lg bg-[#C69C48] text-[#174D36] flex items-center justify-center font-black text-sm shrink-0">
-                    99.8%
-                  </div>
-                  <div className="text-left pr-2">
-                    <p className="text-xs font-bold leading-tight">Sortex Stone-Free</p>
-                    <p className="text-[10px] text-[#D5D0C3]">Optical color cleaned</p>
-                  </div>
-                </div>
-              </div>
+          {/* 4 Feature Value Pillars */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-12 text-left">
+            <div className="p-4 rounded-2xl bg-white border border-[#EAE6DD] shadow-2xs">
+              <div className="text-xl font-black text-[#174D36]">99.8%</div>
+              <div className="text-xs font-bold text-[#174D36] mt-0.5">Stone-Free Sortex</div>
+              <p className="text-[11px] text-[#6B726A] mt-1">Optical camera cleaned</p>
+            </div>
+            <div className="p-4 rounded-2xl bg-white border border-[#EAE6DD] shadow-2xs">
+              <div className="text-xl font-black text-[#174D36]">&lt;14%</div>
+              <div className="text-xs font-bold text-[#174D36] mt-0.5">Optimal Moisture</div>
+              <p className="text-[11px] text-[#6B726A] mt-1">Maximum storage shelf life</p>
+            </div>
+            <div className="p-4 rounded-2xl bg-white border border-[#EAE6DD] shadow-2xs">
+              <div className="text-xl font-black text-[#174D36]">120+</div>
+              <div className="text-xs font-bold text-[#174D36] mt-0.5">Nasarawa Farmers</div>
+              <p className="text-[11px] text-[#6B726A] mt-1">Direct community off-take</p>
+            </div>
+            <div className="p-4 rounded-2xl bg-white border border-[#EAE6DD] shadow-2xs">
+              <div className="text-xl font-black text-[#C69C48]">100%</div>
+              <div className="text-xs font-bold text-[#174D36] mt-0.5">Nigerian Grown</div>
+              <p className="text-[11px] text-[#6B726A] mt-1">Premium parboiled grains</p>
             </div>
           </div>
         </div>
@@ -230,137 +178,149 @@ export const Home: React.FC = () => {
         </div>
       </section>
 
-      {/* 3. FEATURED PRODUCTS */}
+      {/* 3. UPCOMING PRODUCTS LAUNCH MESSAGE */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4 mb-10 pb-4 border-b border-[#EAE6DD]">
-          <div>
-            <span className="text-xs font-bold uppercase tracking-wider text-[#C69C48]">
-              Our Product Catalogue
-            </span>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-[#174D36] mt-1">
-              Featured Rice Packages
-            </h2>
-          </div>
-          <button
-            onClick={() => {
-              setCurrentPage('shop');
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-            }}
-            className="text-sm font-semibold text-[#174D36] hover:text-[#C69C48] flex items-center gap-1 transition-colors cursor-pointer"
-          >
-            <span>View Full Catalogue</span>
-            <ChevronRight className="w-4 h-4" />
-          </button>
-        </div>
-
-        {loading ? (
-          <div className="py-16 text-center text-sm text-[#6B726A]">
-            Loading PrimeSource Rice products...
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {products.map((product) => (
-              <div
-                key={product.id}
-                className="bg-white rounded-2xl border border-[#EAE6DD] overflow-hidden flex flex-col justify-between shadow-xs hover:shadow-md hover:border-[#174D36]/40 transition-all group"
-              >
-                {/* Image Container */}
-                <div
-                  onClick={() => handleProductClick(product)}
-                  className="relative aspect-4/3 bg-[#F3EFE6] overflow-hidden cursor-pointer"
-                >
-                  <img
-                    src={product.imageUrl}
-                    alt={product.name}
-                    className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
-                  />
-                  <div className="absolute top-3 right-3 bg-[#174D36] text-white text-xs font-bold px-2.5 py-1 rounded-md shadow-xs">
-                    {product.size}
-                  </div>
-                  {product.inStock ? (
-                    <div className="absolute bottom-3 left-3 bg-white/90 backdrop-blur-xs text-[#174D36] text-[11px] font-semibold px-2 py-0.5 rounded-sm">
-                      In Stock · {product.stockCount} bags
-                    </div>
-                  ) : (
-                    <div className="absolute bottom-3 left-3 bg-red-100 text-red-700 text-[11px] font-semibold px-2 py-0.5 rounded-sm">
-                      Low Stock / Pre-order
-                    </div>
-                  )}
-                </div>
-
-                {/* Content */}
-                <div className="p-5 flex-1 flex flex-col justify-between">
-                  <div>
-                    <h3
-                      onClick={() => handleProductClick(product)}
-                      className="font-bold text-[#174D36] text-base leading-snug hover:underline cursor-pointer mb-1.5"
-                    >
-                      {product.name}
-                    </h3>
-                    <p className="text-xs text-[#555C57] line-clamp-2 mb-3">
-                      {product.shortDescription}
-                    </p>
-                    <div className="text-xs text-[#6B726A] space-y-0.5 mb-4">
-                      <p>• {product.grainType}</p>
-                      <p>• {product.purityPercentage}</p>
-                    </div>
-                  </div>
-
-                  <div className="pt-3 border-t border-[#F3EFE6]">
-                    <div className="flex items-baseline justify-between mb-3">
-                      <div>
-                        <span className="text-[10px] uppercase tracking-wider text-[#6B726A]">Sample Price</span>
-                        <div className="text-xl font-extrabold text-[#174D36]">
-                          ₦{product.price.toLocaleString('en-NG')}
-                        </div>
-                      </div>
-                      <span className="text-xs text-[#6B726A]">Per bag</span>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-2">
-                      <button
-                        onClick={() => handleProductClick(product)}
-                        className="w-full py-2 px-2 text-xs font-semibold text-[#174D36] bg-[#F3EFE6] hover:bg-[#EAE6DD] rounded-lg transition-colors flex items-center justify-center gap-1 cursor-pointer"
-                      >
-                        <Eye className="w-3.5 h-3.5" />
-                        Details
-                      </button>
-                      <button
-                        onClick={() => addToCart(product, 1)}
-                        className="w-full py-2 px-2 text-xs font-semibold text-white bg-[#174D36] hover:bg-[#0F3324] rounded-lg transition-colors flex items-center justify-center gap-1 cursor-pointer shadow-xs active:scale-95"
-                      >
-                        <ShoppingBag className="w-3.5 h-3.5 text-[#C69C48]" />
-                        Add to Cart
-                      </button>
-                    </div>
-                  </div>
-                </div>
+        <div className="bg-white rounded-3xl border border-[#EAE6DD] p-6 sm:p-10 lg:p-12 shadow-xs">
+          {/* Header */}
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-8 border-b border-[#EAE6DD]">
+            <div>
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#C69C48]/20 text-[#174D36] text-xs font-bold uppercase tracking-wider mb-2">
+                <Clock className="w-3.5 h-3.5 text-[#C69C48]" />
+                Upcoming Mill Production · Launching Soon
               </div>
-            ))}
+              <h2 className="text-2xl sm:text-4xl font-extrabold text-[#174D36] tracking-tight">
+                Our Products — Coming Soon
+              </h2>
+              <p className="text-sm sm:text-base text-[#555C57] mt-2 max-w-2xl leading-relaxed">
+                PrimeSource Rice is currently in its active harvest processing, precision de-stoning, and parboiling stage in Assakio-Lafia, Nasarawa State. We are preparing our official retail and wholesale launch.
+              </p>
+            </div>
+
+            <button
+              onClick={() => {
+                setCurrentPage('shop');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+              className="px-5 py-2.5 rounded-xl bg-[#174D36] text-white hover:bg-[#0F3324] text-xs sm:text-sm font-semibold flex items-center justify-center gap-1.5 transition-colors cursor-pointer self-start md:self-end"
+            >
+              <span>View Upcoming Packaging Guide</span>
+              <ChevronRight className="w-4 h-4" />
+            </button>
           </div>
-        )}
+
+          {/* Upcoming Milling & Packaging Roadmap (No Cards) */}
+          <div className="my-8 p-6 sm:p-8 rounded-2xl bg-[#FAF9F6] border border-[#EAE6DD] space-y-4">
+            <h3 className="text-base sm:text-lg font-bold text-[#174D36] flex items-center gap-2">
+              <Package className="w-5 h-5 text-[#C69C48]" />
+              <span>Upcoming Commercial Bag Sizes (Launching Soon)</span>
+            </h3>
+            <p className="text-xs sm:text-sm text-[#555C57] leading-relaxed">
+              Upon official rollout from our Assakio-Lafia processing center, PrimeSource Rice will be distributed in 4 standard packaging sizes tailored for different needs:
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 pt-2 text-xs">
+              <div className="border-l-2 border-[#174D36] pl-3 py-1">
+                <p className="font-bold text-[#174D36]">5kg Hermetic Pack</p>
+                <p className="text-[#6B726A] text-[11px]">Students & compact households</p>
+              </div>
+              <div className="border-l-2 border-[#174D36] pl-3 py-1">
+                <p className="font-bold text-[#174D36]">10kg Everyday Family</p>
+                <p className="text-[#6B726A] text-[11px]">Weekly household meals</p>
+              </div>
+              <div className="border-l-2 border-[#174D36] pl-3 py-1">
+                <p className="font-bold text-[#174D36]">25kg Household & Catering</p>
+                <p className="text-[#6B726A] text-[11px]">Events & large families</p>
+              </div>
+              <div className="border-l-2 border-[#174D36] pl-3 py-1">
+                <p className="font-bold text-[#174D36]">50kg Wholesale Sack</p>
+                <p className="text-[#6B726A] text-[11px]">Commercial & institutional</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Upcoming Launch Notice Box */}
+          <div className="bg-[#174D36] text-white rounded-2xl p-6 sm:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+            <div className="space-y-1.5 max-w-xl">
+              <div className="flex items-center gap-2 text-xs font-bold text-[#DFBA6D]">
+                <Wheat className="w-4 h-4 text-[#C69C48]" />
+                <span>OFFICIAL LAUNCH IN PREPARATION</span>
+              </div>
+              <h3 className="text-lg sm:text-xl font-bold">
+                No products are uploaded for retail checkout yet.
+              </h3>
+              <p className="text-xs sm:text-sm text-[#D5D0C3] leading-relaxed">
+                We believe in 100% transparency. Our commercial milling and de-stoning lines are concluding setup. Official prices, distribution depots, and instant orders will open at launch. Pre-register today to secure priority supply!
+              </p>
+            </div>
+
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 shrink-0">
+              <button
+                onClick={() => {
+                  setCurrentPage('shop');
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+                className="px-6 py-3 rounded-xl bg-[#C69C48] hover:bg-[#A57F32] text-[#174D36] font-bold text-xs sm:text-sm transition-colors text-center cursor-pointer shadow-sm"
+              >
+                Pre-Order Waitlist
+              </button>
+              <button
+                onClick={() => {
+                  setCurrentPage('bulk-orders');
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+                className="px-6 py-3 rounded-xl bg-white/10 hover:bg-white/20 text-white border border-white/20 font-semibold text-xs sm:text-sm transition-colors text-center cursor-pointer"
+              >
+                Bulk Supply Inquiry
+              </button>
+            </div>
+          </div>
+        </div>
       </section>
 
       {/* 4. OUR STORY: NASARAWA VALUE CHAIN */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
-          <div className="lg:col-span-6 relative">
-            <div className="rounded-2xl overflow-hidden shadow-lg border border-[#EAE6DD]">
-              <img
-                src="https://images.unsplash.com/photo-1536304993881-ff6e9eefa2a6?auto=format&fit=crop&w=900&q=80"
-                alt="Golden harvested paddy rice ready for parboiling"
-                className="w-full h-80 sm:h-96 object-cover"
-              />
-            </div>
-            {/* Story Card overlay */}
-            <div className="absolute -bottom-6 -right-3 sm:right-6 bg-white p-4 sm:p-5 rounded-xl border border-[#EAE6DD] shadow-lg max-w-xs">
-              <p className="text-xs font-bold text-[#174D36] flex items-center gap-1.5 mb-1">
-                <Users className="w-4 h-4 text-[#C69C48]" />
-                Empowering Rural Outgrowers
-              </p>
-              <p className="text-[11px] text-[#555C57]">
-                Over 120 smallholder farmers in Doma, Awe, and Assakio receive guaranteed off-take contracts at fair market rates.
-              </p>
+          <div className="lg:col-span-6">
+            <div className="bg-[#FAF9F6] p-8 sm:p-10 rounded-3xl border border-[#EAE6DD] space-y-6 shadow-xs">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-2xl bg-[#174D36] text-[#C69C48] flex items-center justify-center font-black">
+                  <Wheat className="w-6 h-6 stroke-[2.2]" />
+                </div>
+                <div>
+                  <h3 className="font-extrabold text-[#174D36] text-lg">Assakio-Lafia Agrarian Hub</h3>
+                  <p className="text-xs text-[#6B726A]">Central Processing & Sortex De-stoning Operations</p>
+                </div>
+              </div>
+
+              <div className="space-y-3 pt-2 text-xs">
+                <div className="p-3.5 rounded-xl bg-white border border-[#EAE6DD] flex items-center justify-between">
+                  <div>
+                    <p className="font-bold text-[#174D36]">Smallholder Outgrowers</p>
+                    <p className="text-[#6B726A] text-[11px]">Doma, Awe, Assakio & Keana communities</p>
+                  </div>
+                  <span className="font-extrabold text-[#C69C48] text-sm">120+ Farmers</span>
+                </div>
+
+                <div className="p-3.5 rounded-xl bg-white border border-[#EAE6DD] flex items-center justify-between">
+                  <div>
+                    <p className="font-bold text-[#174D36]">Sortex Optical Purity</p>
+                    <p className="text-[#6B726A] text-[11px]">Camera color sensor & rubber-roller destoner</p>
+                  </div>
+                  <span className="font-extrabold text-[#174D36] text-sm">99.8% Stone-Free</span>
+                </div>
+
+                <div className="p-3.5 rounded-xl bg-white border border-[#EAE6DD] flex items-center justify-between">
+                  <div>
+                    <p className="font-bold text-[#174D36]">Moisture Control Target</p>
+                    <p className="text-[#6B726A] text-[11px]">Controlled solar & steam drying beds</p>
+                  </div>
+                  <span className="font-extrabold text-[#174D36] text-sm">&lt;14.0%</span>
+                </div>
+              </div>
+
+              <div className="p-3.5 rounded-xl bg-[#174D36]/5 border border-[#174D36]/15 text-[11px] text-[#4A524D] flex items-center gap-2.5">
+                <Users className="w-4 h-4 text-[#C69C48] shrink-0" />
+                <span>Fair farmgate compensation empowering rural Nigerian agricultural families directly.</span>
+              </div>
             </div>
           </div>
 

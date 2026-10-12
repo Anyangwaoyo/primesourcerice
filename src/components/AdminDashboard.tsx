@@ -74,7 +74,7 @@ export const AdminDashboard: React.FC = () => {
     moistureContent: '13.0%',
     purityPercentage: '99.8% stone-free',
     origin: 'Nasarawa State, Nigeria',
-    imageUrl: 'https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=800&q=80',
+    imageUrl: '',
   });
 
   // Settings Edit State
@@ -670,7 +670,7 @@ export const AdminDashboard: React.FC = () => {
                   moistureContent: '13.0%',
                   purityPercentage: '99.8% sortex clean',
                   origin: 'Nasarawa State, Nigeria',
-                  imageUrl: 'https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=800&q=80',
+                  imageUrl: '',
                 });
                 setIsAddingProduct(true);
               }}
@@ -686,16 +686,23 @@ export const AdminDashboard: React.FC = () => {
             {products.map((p) => (
               <div key={p.id} className="border border-[#EAE6DD] rounded-2xl p-4 bg-[#FAF9F6] flex flex-col justify-between space-y-4">
                 <div className="space-y-3">
-                  <div className="aspect-4/3 rounded-xl overflow-hidden bg-neutral-200 relative">
-                    <img src={p.imageUrl} alt={p.name} className="w-full h-full object-cover" />
+                  <div className="aspect-4/3 rounded-xl overflow-hidden bg-[#F3EFE6] relative flex items-center justify-center border border-[#EAE6DD]">
+                    <div className="flex flex-col items-center justify-center text-[#174D36]">
+                      <Package className="w-8 h-8 text-[#174D36] mb-1" />
+                      <span className="text-xs font-extrabold">{p.size} SKU</span>
+                    </div>
                     <span className="absolute top-2 right-2 bg-[#174D36] text-white text-[10px] font-bold px-2 py-0.5 rounded">
                       {p.size}
                     </span>
                   </div>
                   <div>
                     <h4 className="font-bold text-xs text-[#174D36] leading-snug">{p.name}</h4>
-                    <p className="text-base font-extrabold text-[#242A26] mt-1">₦{p.price.toLocaleString('en-NG')}</p>
-                    <p className="text-[11px] text-[#6B726A]">{p.stockCount} bags in stock · {p.inStock ? 'Available' : 'Hidden'}</p>
+                    <p className="text-sm font-extrabold text-[#174D36] mt-1">
+                      {p.price > 0 ? `₦${p.price.toLocaleString('en-NG')}` : 'Coming Soon (Pre-Launch)'}
+                    </p>
+                    <p className="text-[11px] text-[#6B726A]">
+                      {p.status === 'coming_soon' || !p.inStock ? 'Status: Coming Soon · Pre-Orders Open' : `${p.stockCount} bags in stock`}
+                    </p>
                   </div>
                 </div>
 

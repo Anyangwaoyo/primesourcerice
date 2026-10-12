@@ -245,24 +245,25 @@ ABOUT PRIMESOURCE RICE:
 - Quality guarantee: 100% stone-free, no chaff, no sand, high swelling volume, non-sticky cooking, perfect for Jollof, Fried Rice, and White Rice with stew.
 - Primary Location: Assakio-Lafia, Nasarawa State.
 - Contact: WhatsApp/Phone: ${settings.whatsapp}, Email: ${settings.email}
+- CURRENT STATUS: We are currently in our processing and setup stage in Nasarawa State. All rice products are COMING SOON. Customers can explore specifications and register their pre-order interest via WhatsApp (${settings.whatsapp}) or the website.
 
-AVAILABLE PACKAGING SIZES & PRODUCTS:
+AVAILABLE PACKAGING SIZES & PRODUCTS (COMING SOON):
 ${productContext}
 
 DELIVERY COVERAGE:
 ${deliveryContext}
 
 CRITICAL MANDATORY INSTRUCTION - STARTUP MVP PRICING POLICY:
-- We are currently in the startup MVP stage of PrimeSource Rice.
+- We are currently in the startup MVP stage of PrimeSource Rice and products are Coming Soon.
 - Under NO circumstance should you quote, state, estimate, or list any specific prices, Naira amounts (₦), or costs in your responses.
 - The chatbot's role is EXCLUSIVELY to give explanations about the product specifications, quality, milling standards, packaging, and deliveries.
 - If a customer asks about prices, costs, rates, or "how much":
-  Explain politely that because PrimeSource Rice is currently in its startup MVP stage, official prices are not quoted directly in the chat assistant. Direct them to check the sample catalogue on the "Shop Rice" page, place an order request on the website, or contact our sales team directly on WhatsApp at ${settings.whatsapp} for official commercial quotes.
+  Explain politely that because PrimeSource Rice is currently in its startup pre-launch stage, products are Coming Soon and official prices are not quoted directly in the chat assistant. Direct them to check the upcoming catalogue on the "Products" page or contact our sales team directly on WhatsApp at ${settings.whatsapp} for official quotes and launch notifications.
 - Always provide helpful product explanations: explain bag sizes (5kg, 10kg, 25kg, 50kg), stone-free Sortex cleaning, grain length, swelling capacity, storage, and dispatch logistics.
 
 RULES FOR YOUR RESPONSES:
 1. Product Explanations Only: Detail the grain purity, processing, texture, cooking yield, and suitability for families, caterers, or commercial institutions.
-2. Absolutely Zero Price Quotes: Do not provide numbers, fees, or Naira prices for any bag. Direct pricing queries to WhatsApp (${settings.whatsapp}) or the Shop page.
+2. Absolutely Zero Price Quotes: Do not provide numbers, fees, or Naira prices for any bag. Direct queries to WhatsApp (${settings.whatsapp}) or the Products page.
 3. Tone: Warm, professional, courteous Nigerian agribusiness etiquette ("Good day", "Warm greetings").
 4. Clear & Concise: 2 to 3 friendly, structured paragraphs.`;
 
@@ -270,30 +271,30 @@ RULES FOR YOUR RESPONSES:
   const generateFallbackResponse = (query: string): string => {
     const q = query.toLowerCase();
     if (q.includes('price') || q.includes('cost') || q.includes('how much') || q.includes('amount') || q.includes('naira') || q.includes('rate') || q.includes('quote')) {
-      return `Because PrimeSource Rice is currently in our startup MVP stage, prices are not quoted directly in the chat assistant. You can review the sample demonstration catalogue in our "Shop Rice" section or chat directly with our commercial desk on WhatsApp at ${settings.whatsapp} for official current pricing.\n\nOur rice is premium Nigerian long-grain parboiled rice, 100% stone-free, available in 5kg, 10kg, 25kg, and 50kg bags. Would you like details on grain specifications or packaging?`;
+      return `Our rice packages are currently Coming Soon as we finalize our commercial milling setup in Nasarawa State. Official prices will be announced at launch! You can review the upcoming packaging sizes on our "Products" page or message our team directly on WhatsApp at ${settings.whatsapp} to join our pre-order launch list.\n\nOur rice is premium Nigerian long-grain parboiled rice, 100% stone-free, available in 5kg, 10kg, 25kg, and 50kg bags. Would you like details on grain specifications or packaging?`;
     }
     if (q.includes('50kg') || (q.includes('50') && q.includes('bag'))) {
-      return `Our 50kg bag is the Commercial Wholesale Sack, packaged in a heavy-duty food-grade woven polypropylene sack. It contains long-grain parboiled rice that is 100% sortex-cleaned and stone-free, ideal for restaurants, caterers, schools, and bulk food re-sellers. Note that in our startup MVP stage, prices are not quoted in chat—you can place an order request or message our WhatsApp desk at ${settings.whatsapp}.`;
+      return `Our 50kg bag is the Commercial Wholesale Sack, packaged in a heavy-duty food-grade woven polypropylene sack. It contains long-grain parboiled rice that is 100% sortex-cleaned and stone-free, ideal for restaurants, caterers, schools, and bulk food re-sellers. This product is Coming Soon—you can register pre-order interest on our website or message our WhatsApp desk at ${settings.whatsapp}.`;
     }
     if (q.includes('25kg') || (q.includes('25') && q.includes('bag'))) {
-      return `Our 25kg bag is our most popular size for families and catering. It is premium Nasarawa parboiled long grain, thoroughly de-stoned with a low broken ratio (<4%) and high swelling volume that cooks without clumping. Because we are in the startup MVP stage, prices are not quoted in chat; you can review our Shop page or chat with us on WhatsApp at ${settings.whatsapp}.`;
+      return `Our 25kg bag is our most popular upcoming size for families and catering. It is premium Nasarawa parboiled long grain, thoroughly de-stoned with a low broken ratio (<4%) and high swelling volume that cooks without clumping. It is currently Coming Soon; you can pre-order interest on our Products page or chat with us on WhatsApp at ${settings.whatsapp}!`;
     }
     if (q.includes('10kg') || (q.includes('10') && q.includes('bag'))) {
-      return `Our 10kg bag is the everyday family size, packaged in a reinforced woven bag with an easy-carry handle. It offers clean, uniform grains that cook with natural aroma and excellent texture. In our MVP stage, prices are not quoted in chat; feel free to view the Shop catalogue or reach out via WhatsApp.`;
+      return `Our 10kg bag is the everyday family size, packaged in a reinforced woven bag with an easy-carry handle. It offers clean, uniform grains that cook with natural aroma and excellent texture. This size is Coming Soon; feel free to view the specifications or reach out via WhatsApp for pre-orders.`;
     }
     if (q.includes('5kg') || (q.includes('5') && q.includes('bag'))) {
-      return `Our 5kg pack is designed for students, small households, or sampling. It features a protective inner moisture barrier to keep the grains fresh and dry. In this MVP stage, prices are not quoted here; you can explore the Shop catalogue or contact our team on WhatsApp.`;
+      return `Our 5kg pack is designed for students, small households, or sampling. It features a protective inner moisture barrier to keep the grains fresh and dry. This product is Coming Soon; you can register for launch notifications on WhatsApp.`;
     }
     if (q.includes('deliver') || q.includes('abuja') || q.includes('lafia') || q.includes('location') || q.includes('where')) {
-      return `We are based in Assakio-Lafia, Nasarawa State! We deliver across Lafia and neighboring Nasarawa communities (Doma, Keana, Awe, Assakio), and offer scheduled transit delivery to Abuja Metropolitan. Free self-pickup is also available at our Assakio-Lafia facility.`;
+      return `We are based in Assakio-Lafia, Nasarawa State! Upon commercial launch, we deliver across Lafia and neighboring Nasarawa communities (Doma, Keana, Awe, Assakio), and offer scheduled transit delivery to Abuja Metropolitan. Free self-pickup is also available at our Assakio-Lafia facility.`;
     }
     if (q.includes('bulk') || q.includes('wholesale') || q.includes('distributor') || q.includes('restaurant')) {
-      return `We supply wholesale orders to supermarkets, food vendors, caterers, and institutions. Visit our "Bulk Orders" page to submit your quantity requirements and delivery date, or contact our commercial sales desk on WhatsApp at ${settings.whatsapp}.`;
+      return `We are accepting wholesale pre-allocations for supermarkets, food vendors, caterers, and institutions. Visit our "Bulk Orders" page to submit your quantity requirements, or contact our commercial sales desk on WhatsApp at ${settings.whatsapp}.`;
     }
     if (q.includes('stone') || q.includes('clean') || q.includes('quality') || q.includes('sand')) {
       return `PrimeSource Rice is guaranteed 100% stone-free! We pass all harvested paddy through precision destoning separators and modern Sortex color sorting machines to eliminate all sand, debris, and discolored grains before packaging.`;
     }
-    return `Welcome to PrimeSource Rice! We supply clean, stone-free Nigerian parboiled rice sourced from local farmers in Nasarawa State, available in 5kg, 10kg, 25kg, and 50kg bags. As we are currently in our startup MVP stage, I provide product specifications and details rather than price quotes. How can I assist you with product details or ordering today? You can also message our sales team on WhatsApp at ${settings.whatsapp}.`;
+    return `Welcome to PrimeSource Rice! We supply clean, stone-free Nigerian parboiled rice sourced from local farmers in Nasarawa State, available in 5kg, 10kg, 25kg, and 50kg bags. Our products are currently Coming Soon in our startup launch phase. How can I assist you with product specifications or pre-order details today? You can also message our sales team on WhatsApp at ${settings.whatsapp}.`;
   };
 
   if (!ai) {
@@ -352,6 +353,8 @@ RULES FOR YOUR RESPONSES:
 });
 
 // ==================== VITE MIDDLEWARE / STATIC ASSETS ====================
+
+app.use(express.static('public'));
 
 async function startServer() {
   if (process.env.NODE_ENV === 'production') {
