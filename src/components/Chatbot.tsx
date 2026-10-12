@@ -94,7 +94,7 @@ export const Chatbot: React.FC = () => {
       {!isOpen && (
         <button
           onClick={() => setIsOpen(true)}
-          className="fixed bottom-6 right-6 z-40 bg-[#174D36] text-white p-2 sm:px-4 sm:py-2.5 rounded-full shadow-2xl hover:bg-[#0F3324] hover:scale-105 active:scale-95 transition-all flex items-center gap-3 cursor-pointer border-2 border-[#C69C48]"
+          className="fixed bottom-6 left-6 z-40 bg-[#174D36] text-white p-2 sm:px-4 sm:py-2.5 rounded-full shadow-2xl hover:bg-[#0F3324] hover:scale-105 active:scale-95 transition-all flex items-center gap-3 cursor-pointer border-2 border-[#C69C48]"
           aria-label="Open PrimeSource Assistant Chatbot"
         >
           <div className="relative w-11 h-11 rounded-full border-2 border-[#C69C48] bg-[#FAF9F6] flex items-center justify-center shrink-0 shadow-xs text-[#174D36]">
@@ -110,7 +110,7 @@ export const Chatbot: React.FC = () => {
 
       {/* Floating Chat Window */}
       {isOpen && (
-        <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 w-[calc(100vw-2rem)] sm:w-96 max-h-[85vh] h-[530px] bg-white rounded-3xl shadow-2xl border border-[#EAE6DD] flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-5 duration-200">
+        <div className="fixed bottom-4 left-4 sm:bottom-6 sm:left-6 z-50 w-[calc(100vw-2rem)] sm:w-96 max-h-[85vh] h-[530px] bg-white rounded-3xl shadow-2xl border border-[#EAE6DD] flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-5 duration-200">
           {/* Header */}
           <div className="bg-[#174D36] text-white px-5 py-3.5 flex items-center justify-between border-b border-[#226B4C]">
             <div className="flex items-center gap-3">
